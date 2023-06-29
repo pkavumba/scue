@@ -1,0 +1,1 @@
+from .multiple_choice import Prepocessor as MultipleChoicePreprocessor
