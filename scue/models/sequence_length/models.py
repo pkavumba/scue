@@ -44,12 +44,13 @@ class SequenceLengthModelForMultipleChoice(BaseModel):
             )
         return formatted_data
 
-    def _get_correct_rank(self, data_points: dict[str, Any]) -> int:
-        sorted_choices = sorted(data_points["choices"], reverse=True)
-        correct_choice = data_points["choices"][data_points["label"]]
-        rank = sorted_choices.index(correct_choice) + 1
+    def _get_correct_rank(self, data_point: dict[str, Any]) -> int:
+        choices = [(choice, idx) for idx, choice in enumerate(data_point["choices"])]
+        sorted_choices = sorted(choices, key=lambda x: x[0], reverse=True)
 
-        return rank
+        for rank, (choice, idx) in enumerate(sorted_choices):
+            if idx == data_point["label"]:
+                return rank + 1
 
     def _get_correct_ranks(self, data):
         ranks = []
@@ -59,9 +60,10 @@ class SequenceLengthModelForMultipleChoice(BaseModel):
 
     def _predict(self, choice_lengths):
         common_rank = self.most_common_rank
-        sorted_choices = sorted(choice_lengths, reverse=True)
-        correct_score = sorted_choices[common_rank - 1]
-        return choice_lengths.index(correct_score)
+        choices = [(choice_len, idx) for idx, choice_len in enumerate(choice_lengths)]
+        sorted_choices = sorted(choices, key=lambda x: x[0], reverse=True)
+        _, idx = sorted_choices[common_rank - 1]
+        return idx
 
     def fit(self):
         self._extract_ngrams(self.training_data)
