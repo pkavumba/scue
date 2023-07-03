@@ -6,12 +6,12 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Any
 
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from tqdm import tqdm
 
 from ...utils import (
     CORRECT_TOKEN,
     INCORRECT_TOKEN,
+    compute_accuracy,
     compute_pmi,
     compute_pmi_for_all_keys,
     compute_pmi_for_all_ngrams,
@@ -188,7 +188,7 @@ class ApplicabilityNgramModelForMultipleChoice(BaseModel):
         )[:n]:
             wrong_ngrams.append(stats_obj)
 
-        return {"correct": correct_ngrams, "wrong": wrong_ngrams}
+        return {"correct": correct_ngrams, "incorrect": wrong_ngrams}
 
     def widest_coverage_ngrams(
         self, n: int = 10
@@ -209,7 +209,7 @@ class ApplicabilityNgramModelForMultipleChoice(BaseModel):
         )[:n]:
             wrong_ngrams.append(stats_obj)
 
-        return {"correct": correct_ngrams, "wrong": wrong_ngrams}
+        return {"correct": correct_ngrams, "incorrect": wrong_ngrams}
 
     def estimate_correct_answer(self, test_instance):
         choice_applicability_values = []
@@ -242,19 +242,14 @@ class ApplicabilityNgramModelForMultipleChoice(BaseModel):
 
     def important_features(self):
         return {
-            "correctness": self.most_productivity_ngrams(n=100),
-            "incorrectness": self.widest_coverage_ngrams(n=100),
+            "productivity": self.most_productivity_ngrams(n=100),
+            "coverage": self.widest_coverage_ngrams(n=100),
         }
 
     def evaluate(self, data):
         predictions = self.predict(data)[0]
         labels = [item["label"] for item in data]
-        results = {
-            "acc": accuracy_score(labels, predictions),
-            "precision": precision_score(labels, predictions),
-            "recall": recall_score(labels, predictions),
-            "f1": f1_score(labels, predictions),
-        }
+        results = {"acc": compute_accuracy(labels, predictions)}
         return results
 
     def predict(self, data):
@@ -356,12 +351,7 @@ class PPMINgramModelForMultipleChoice(BaseModel):
     def evaluate(self, data):
         predictions = self.predict(data)[0]
         labels = [item["label"] for item in data]
-        return {
-            "acc": accuracy_score(labels, predictions),
-            "precision": precision_score(labels, predictions),
-            "recall": recall_score(labels, predictions),
-            "f1": f1_score(labels, predictions),
-        }
+        return {"acc": compute_accuracy(labels, predictions)}
 
     def predict(self, data):
         self._extract_ngrams(data)

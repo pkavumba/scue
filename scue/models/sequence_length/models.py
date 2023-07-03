@@ -5,9 +5,9 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from tqdm import tqdm
 
+from ...utils import compute_accuracy
 from ..abc import BaseModel
 
 
@@ -84,19 +84,14 @@ class SequenceLengthModelForMultipleChoice(BaseModel):
         predictions = self.predict(data)
         labels = [item[self.label_field] for item in data]
 
-        return {
-            "acc": accuracy_score(labels, predictions),
-            "f1": f1_score(labels, predictions, average="macro"),
-            "precision": precision_score(labels, predictions, average="macro"),
-            "recall": recall_score(labels, predictions, average="macro"),
-        }
+        return {"acc": compute_accuracy(labels, predictions)}
 
     def load(self):
         pass
 
     @property
     def important_features(self):
-        return Counter(self.ranks).most_common()
+        return Counter(self.ranks)
 
     def save(self):
         pass

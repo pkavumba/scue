@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 from typing import List, Tuple
+import numpy as np
 
 from .scue import (
     get_vocab_size_total_counts,
@@ -49,3 +50,19 @@ def train_test_split(
     train_data = data[test_size:]
 
     return train_data, test_data
+
+
+def compute_accuracy(labels: list[int], predictions: list[int]):
+    """
+    Computes the accuracy of a list of predictions.
+
+    Args:
+        predictions (list[int]): A list of predictions.
+        labels (list[int]): A list of labels.
+
+    Returns:
+        float: The accuracy of the predictions.
+    """
+    preds, answers = np.array(predictions), np.array(labels)
+
+    return 100 * (preds == answers).mean()

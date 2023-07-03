@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import json
+import logging
 from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
 import spacy
 from tqdm import tqdm
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +68,7 @@ class Prepocessor:
                     {
                         "id": item[self.id_field],
                         "label": item[self.label_field],
+                        # "question": item["question"],
                         "choices": [
                             {
                                 "text": val,

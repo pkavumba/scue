@@ -9,12 +9,12 @@ from typing import Any
 
 import gensim.downloader as gensim_api
 import numpy as np
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.tree import DecisionTreeClassifier
 from tqdm import tqdm
 
 from ...models.abc import BaseModel
 from ...token import Token
+from ...utils import compute_accuracy
 
 
 @dataclass
@@ -129,12 +129,7 @@ class LexicalOverlapModelForMultipleChoice(BaseModel):
         predictions = self.predict(data)
         labels = [item[self.label_field] for item in data]
 
-        return {
-            "acc": accuracy_score(labels, predictions),
-            "f1": f1_score(labels, predictions, average="macro"),
-            "precision": precision_score(labels, predictions, average="macro"),
-            "recall": recall_score(labels, predictions, average="macro"),
-        }
+        return {"acc": compute_accuracy(labels, predictions)}
 
     def load(self):
         pass
