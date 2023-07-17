@@ -185,7 +185,7 @@ class ApplicabilityNgramModelForMultipleChoice(BaseModel):
             self.wrong_applicability_statistics.values(),
             key=lambda x: x.productivity,
             reverse=True,
-        )[:n]:
+        ):  # [:n]:
             wrong_ngrams.append(stats_obj)
 
         return {"correct": correct_ngrams, "incorrect": wrong_ngrams}
