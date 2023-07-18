@@ -1,5 +1,7 @@
 # scue
 
+`scue` pronounced as `skew` is a library for analyzing superficial cues in natural language understanding datasets.
+
 ## Usage
 
 `scue` supports
